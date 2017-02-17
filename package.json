@@ -1,6 +1,6 @@
 {
   "name": "number-facts",
-  "description": "Google Actions applications that uses Numbers API to do the fulfillment.",
+  "description": "Google Actions application that uses Numbers API to do the fulfillment.",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
