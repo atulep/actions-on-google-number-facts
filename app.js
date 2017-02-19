@@ -12,7 +12,9 @@ app.use(bodyParser.json({type: 'application/json'}));
 // name of the actions -- correspond to the names I defined in the API.AI console
 const PROVIDE_FACT = "provide_fact";
 const PLAY_AGAIN_YES = "play_again_yes";
+const PLAY_AGAIN_NO = "play_again_no";
 const DEFAULT_WELCOME = "input.welcome";
+const CONTEXT_PLAY_AGAIN = "again_yes_no"; 
 // other useful contstants
 const NUMBER_ARGUMENT = "number";
 const PREFIX_HAPPY = "Sure. Did you know that "; 
@@ -33,7 +35,9 @@ app.post('/', function(request, response) {
     }*/
 
     function callback(fact) {
-        assistant.tell(PREFIX_HAPPY + fact);
+        // important to set the context before invoking assistant.tell
+        assistant.setContext(CONTEXT_PLAY_AGAIN);
+        assistant.tell(PREFIX_HAPPY + fact + "Would you like to try another number?");
     }
 
     /**
@@ -66,11 +70,21 @@ app.post('/', function(request, response) {
         var reply = "Welcome to Number Facts! What number is on your mind?";
         assistant.tell(reply);
     }
-    
+
+    function playAgainYes() {
+        assistant.tell("Great! What's number on your mind?");
+    }
+
+    function playAgainNo() {
+        assistant.tell("Oh well...Everything good has to come to an end sometime. Good bye!");
+    }
+
     //testSendRequest();
     let actionMap = new Map();
     actionMap.set(PROVIDE_FACT, provideFact);
     actionMap.set(DEFAULT_WELCOME, welcome); 
+    actionMap.set(PLAY_AGAIN_YES, playAgainYes);
+    actionMap.set(PLAY_AGAIN_NO, playAgainNo);  
     assistant.handleRequest(actionMap);
 });
 
