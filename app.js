@@ -46,7 +46,9 @@ app.post('/', function(request, response) {
         console.log("Sending GET to " + url);
         var ret_val;
         request.get(url, function(error, response, body) {
+            console.log("Error:" + error);
             ret_val = body;
+            console.log(ret_val);
         });
         return ret_val;
     }
@@ -64,7 +66,6 @@ app.post('/', function(request, response) {
     actionMap.set(PROVIDE_FACT, provideFact);
     actionMap.set(DEFAULT_WELCOME, welcome); 
     assistant.handleRequest(actionMap);
-    testSendRequest();
 });
 
 var server = app.listen(app.get('port'), function() {
