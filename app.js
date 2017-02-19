@@ -20,6 +20,8 @@ const PREFIX_HAPPY = "Sure. Did you know that ";
 app.post('/', function(request, response) {
     const assistant = new Assistant({request: request, response: response});
     
+    /* 
+     * Useful to test my call back functions.   
     function testSendRequest() {
         console.log("Test...");
         var url = "http://numbersapi.com/7/math";        
@@ -28,6 +30,10 @@ app.post('/', function(request, response) {
     
     function callback(res) {
         console.log("Result from sendRequest is " + res);
+    }*/
+
+    function callback(fact) {
+        assistant.tell(PREFIX_HAPPY + fact);
     }
 
     /**
@@ -35,10 +41,7 @@ app.post('/', function(request, response) {
      */
     function provideFact(assistant) {
         var number = assistant.getArgument(NUMBER_ARGUMENT);
-        //var fact = sendRequest("http://numbersapi.com/" + number); // defaults to trivia
-        //var reply = PREFIX_HAPPY + fact;
-        var reply = "Hello World!";
-        assistant.tell(reply);
+        sendRequest("http://numbersapi.com/" + number, callback); // defaults to trivia
     }
     
     /**
@@ -46,12 +49,10 @@ app.post('/', function(request, response) {
      */
     function sendRequest(url, callback) {
         console.log("Sending GET to " + url);
-        var ret_val;
         request_lib.get(url, function(error, response, body) {
             if (!error && response.statusCode == 200) { 
-                ret_val = body;
-                //console.log(ret_val);
-                callback(ret_val);
+                console.log("Fact is " + body);
+                callback(body);
             } else {
                 console.log("Error=" + error);
             }
@@ -66,7 +67,7 @@ app.post('/', function(request, response) {
         assistant.tell(reply);
     }
     
-    testSendRequest();
+    //testSendRequest();
     let actionMap = new Map();
     actionMap.set(PROVIDE_FACT, provideFact);
     actionMap.set(DEFAULT_WELCOME, welcome); 
