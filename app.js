@@ -5,11 +5,10 @@ process.env.DEBUG = 'actions-on-google:*';
 let Assistant = require('actions-on-google').ApiAiAssistant;
 let express = require('express');
 let bodyParser = require('body-parser');
-let request = require('request'); // for sending the http requests to Numbers API
+let request_lib = require('request'); // for sending the http requests to Numbers API
 let app = express();
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({type: 'application/json'}));
-
 // name of the actions -- correspond to the names I defined in the API.AI console
 const PROVIDE_FACT = "provide_fact";
 const PLAY_AGAIN_YES = "play_again_yes";
@@ -23,11 +22,14 @@ app.post('/', function(request, response) {
     
     function testSendRequest() {
         console.log("Test...");
-        var url = "http://numbersapi.com/7/math";
-        var result = sendRequest(url);
-        console.log("Result from sendRequest is " + result);
+        var url = "http://numbersapi.com/7/math";        
+        sendRequest(url, callback);
     } 
     
+    function callback(res) {
+        console.log("Result from sendRequest is " + res);
+    }
+
     /**
      * An action that provides a fact based on the given number by the user. 
      */
@@ -42,15 +44,18 @@ app.post('/', function(request, response) {
     /**
      * Helper function to send the GET request to Numbers API
      */
-    function sendRequest(url) {
+    function sendRequest(url, callback) {
         console.log("Sending GET to " + url);
         var ret_val;
-        request.get(url, function(error, response, body) {
-            console.log("Error:" + error);
-            ret_val = body;
-            console.log(ret_val);
+        request_lib.get(url, function(error, response, body) {
+            if (!error && response.statusCode == 200) { 
+                ret_val = body;
+                //console.log(ret_val);
+                callback(ret_val);
+            } else {
+                console.log("Error=" + error);
+            }
         });
-        return ret_val;
     }
 
     /**
