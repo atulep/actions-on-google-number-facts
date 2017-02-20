@@ -7,6 +7,8 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let request_lib = require('request'); // for sending the http requests to Numbers API
 let app = express();
+let assert = require('assert');
+
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({type: 'application/json'}));
 // name of the actions -- correspond to the names I defined in the API.AI console
@@ -18,6 +20,14 @@ const CONTEXT_PLAY_AGAIN = "again_yes_no";
 // other useful contstants
 const NUMBER_ARGUMENT = "number";
 const PREFIX_HAPPY = "Sure. Did you know that "; 
+const DATE_ARGUMENT = "date";
+const YEAR_ARGUMENT = "date-period";
+// API.AI already allows for robust processing of days/years. Thus, I deferred recognition of days/years to 
+// @sys.date/@sys.date-period native entities. I added an entity @fact-type that only contains 'math'. 
+// Thus, we can only expect fact-type to be math-related.
+const MATH_ARGUMENT = "fact-type";
+const FACT_TYPES = [DATE_ARGUMENT, YEAR_ARGUMENT, MATH_ARGUMENT];
+const NUMBERS_API_BASE_URL = "http://numbersapi.com";
 
 app.post('/', function(request, response) {
     const assistant = new Assistant({request: request, response: response});
@@ -47,10 +57,41 @@ app.post('/', function(request, response) {
      * An action that provides a fact based on the given number by the user. 
      */
     function provideFact(assistant) {
-        var number = assistant.getArgument(NUMBER_ARGUMENT);
-        sendRequest("http://numbersapi.com/" + number, callback); // defaults to trivia
+        var number;
+        var url = NUMBERS_API_BASE_URL;
+        var type;
+
+        for (var i = 0; i < FACT_TYPES.length; i++) {
+            if (assistant.getArgument(FACT_TYPES[i]) != null) {
+                type = FACT_TYPES[i];
+                break;
+            }
+        }
+        
+        assert(typeof(type) != "undefined", 'fact type is null');
+        
+        if (type == MATH_ARGUMENT) {
+            number = assistant.getArgument(MATH_ARGUMENT);
+        } else {
+            number = extractNumber(assistant.getArgument(type));
+        }
+       
+        assert(number, 'number is null');
+        console.log("number = " + number);
+
+        url += "/" + number + "/" + type; 
+        sendRequest(url, callback); // defaults to trivia
     }
     
+
+    /**
+     * Helper function that extracts the number from the given argument using regular expression.
+     */
+    function extractNumber(arg) {
+        var numb = arg.match(/\d/g);
+        return numb.join("");
+    }
+
     /**
      * Helper function to send the GET request to Numbers API
      */
