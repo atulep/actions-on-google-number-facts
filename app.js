@@ -34,6 +34,9 @@ app.post('/', function(request, response) {
         console.log("Result from sendRequest is " + res);
     }*/
 
+    /**
+     * Callback used to perform the logic after Node finishes the API request.
+     */
     function callback(fact) {
         // important to set the context before invoking assistant.tell
         assistant.setContext(CONTEXT_PLAY_AGAIN);
@@ -71,10 +74,16 @@ app.post('/', function(request, response) {
         assistant.tell(reply);
     }
 
+    /**
+     * Action that gets invoked when user wants to ask another fact (i.e. play again).
+     */
     function playAgainYes() {
         assistant.tell("Great! What's number on your mind?");
     }
 
+    /**
+     * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
+     */
     function playAgainNo() {
         assistant.tell("Oh well...Everything good has to come to an end sometime. Good bye!");
     }

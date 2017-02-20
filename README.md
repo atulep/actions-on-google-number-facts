@@ -8,3 +8,6 @@ TODO:
 TODO:
 ## Usage
 TODO:
+
+# License
+MIT (see LICENSE.md)
