@@ -17,16 +17,25 @@ const PLAY_AGAIN_YES = "play_again_yes";
 const PLAY_AGAIN_NO = "play_again_no";
 const DEFAULT_WELCOME = "input.welcome";
 const CONTEXT_PLAY_AGAIN = "again_yes_no"; 
-// other useful contstants
 const NUMBER_ARGUMENT = "number";
-const PREFIX_HAPPY = "Sure. Did you know that "; 
 const DATE_ARGUMENT = "date";
 const YEAR_ARGUMENT = "date-period";
 // API.AI already allows for robust processing of days/years. Thus, I deferred recognition of days/years to 
 // @sys.date/@sys.date-period native entities. I added an entity @fact-type that only contains 'math'. 
 // Thus, we can only expect fact-type to be math-related.
 const MATH_ARGUMENT = "fact-type";
-const FACT_TYPES = [DATE_ARGUMENT, YEAR_ARGUMENT, MATH_ARGUMENT];
+
+// other useful contstants
+const PREFIX_HAPPY = "Sure. Did you know that ";
+const DEFAULT_TYPE = "trivia";
+// map the fact types returned from API.AI to the ones expected at Numbers API
+const FACT_TYPES = {};
+// need to put the variables into dictionary by hand. 
+// see http://stackoverflow.com/questions/10640159/key-for-javascript-dictionary-is-not-stored-as-value-but-as-variable-name
+FACT_TYPES[DATE_ARGUMENT] = 'date';
+FACT_TYPES[YEAR_ARGUMENT] = 'year'; 
+FACT_TYPES[MATH_ARGUMENT] = 'math';
+FACT_TYPES[DEFAULT_TYPE] = 'trivia';
 const NUMBERS_API_BASE_URL = "http://numbersapi.com";
 
 app.post('/', function(request, response) {
@@ -61,25 +70,29 @@ app.post('/', function(request, response) {
         var url = NUMBERS_API_BASE_URL;
         var type;
 
-        for (var i = 0; i < FACT_TYPES.length; i++) {
-            if (assistant.getArgument(FACT_TYPES[i]) != null) {
-                type = FACT_TYPES[i];
+        for (var fact_type in FACT_TYPES) {
+            console.log('fact_type=' + fact_type);
+            if (assistant.getArgument(fact_type) != null) {
+                type = fact_type;
                 break;
             }
         }
         
+        if (type == null) type = DEFAULT_TYPE;
+
         assert(typeof(type) != "undefined", 'fact type is null');
-        
-        if (type == MATH_ARGUMENT) {
-            number = assistant.getArgument(MATH_ARGUMENT);
+        console.log("type=" + type);
+        if (type == MATH_ARGUMENT || type == DEFAULT_TYPE) {
+            number = assistant.getArgument(NUMBER_ARGUMENT);
         } else {
-            number = extractNumber(assistant.getArgument(type));
+            console.log("Arg=" + assistant.getArgument(type));
+            number = extractNumber(assistant.getArgument(type), type);
         }
        
         assert(number, 'number is null');
         console.log("number = " + number);
 
-        url += "/" + number + "/" + type; 
+        url += "/" + number + "/" + FACT_TYPES[type]; 
         sendRequest(url, callback); // defaults to trivia
     }
     
@@ -87,8 +100,14 @@ app.post('/', function(request, response) {
     /**
      * Helper function that extracts the number from the given argument using regular expression.
      */
-    function extractNumber(arg) {
-        var numb = arg.match(/\d/g);
+    function extractNumber(arg, type) {
+        // according to the API.AI documentation the @sys.date-period entity will return the date in a 
+        // ISO-8601 format. I.e. 2014-01-01/2014-12-31. The year is the first one in the return value, so
+        // my regular expression will match the numbers before the '-'. Similarly, I will need to account for the
+        // case when type is @sys.date, which will have the day as the last digits before the '-'.
+        var pattern = type == DATE_ARGUMENT ? /[\d]+$/ : /[\d]+/;
+        //var numb = arg.match(/[\d]+/);
+        var numb = arg.match(pattern);
         return numb.join("");
     }
 
