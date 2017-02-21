@@ -39,137 +39,137 @@ FACT_TYPES[MATH_ARGUMENT] = 'math';
 FACT_TYPES[DEFAULT_TYPE] = 'trivia';
 const NUMBERS_API_BASE_URL = "http://numbersapi.com";
 const HELP_MESSAGE = "I didn't get that. You can ask me about any number. You can also ask me about " +
-                                                                  FACT_TYPES[DATE_ARGUMENT] + ", " + 
-                                                                  FACT_TYPES[YEAR_ARGUMENT] + ", and " + 
-                                                                  FACT_TYPES[MATH_ARGUMENT] + " that this number represents. " + 
-                                                                  "For example, you can say: 'Tell me about 777', or " +
-                                                                  "'Tell me some math about 777'."; 
-                                                                  
+                                                                     FACT_TYPES[DATE_ARGUMENT] + ", " + 
+                                                                 FACT_TYPES[YEAR_ARGUMENT] + ", and " + 
+                                                                            FACT_TYPES[MATH_ARGUMENT] + 
+                                                                     " that this number represents. " + 
+                                                 "For example, you can say: 'Tell me about 777', or " +
+                                                                       "'Tell me some math about 777'."; 
 
 app.post('/', function(request, response) {
-    const assistant = new Assistant({request: request, response: response});
-    
+  const assistant = new Assistant({request: request, response: response});
 
-    /**
-     * Callback used to perform the logic after Node finishes the API request.
-     */
-    function callback(fact) {
-        // important to set the context before invoking assistant.tell
-        assistant.setContext(CONTEXT_PLAY_AGAIN);
-        assistant.tell(PREFIX_HAPPY + fact + "Would you like to try another number?");
+
+  /**
+   * Callback used to perform the logic after Node finishes the API request.
+   */
+  function callback(fact) {
+    // important to set the context before invoking assistant.tell
+    assistant.setContext(CONTEXT_PLAY_AGAIN);
+    assistant.tell(PREFIX_HAPPY + fact + " Would you like to try another number?");
+  }
+
+
+  /**
+   * An action that provides a fact based on the given number and type of fact. 
+   */
+  function provideFact(assistant) {
+    var number;
+    var url = NUMBERS_API_BASE_URL;
+    var type;
+
+    for (var fact_type in FACT_TYPES) {
+      console.log('fact_type=' + fact_type);
+      if (assistant.getArgument(fact_type) != null) {
+        type = fact_type;
+        break;
+      }
     }
 
+    if (type == null) type = DEFAULT_TYPE;
+    assert(typeof(type) != "undefined", 'fact type is undefined');
 
-    /**
-     * An action that provides a fact based on the given number and type of fact. 
-     */
-    function provideFact(assistant) {
-        var number;
-        var url = NUMBERS_API_BASE_URL;
-        var type;
+    console.log("type=" + type);
 
-        for (var fact_type in FACT_TYPES) {
-            console.log('fact_type=' + fact_type);
-            if (assistant.getArgument(fact_type) != null) {
-                type = fact_type;
-                break;
-            }
-        }
-        
-        if (type == null) type = DEFAULT_TYPE;
-        assert(typeof(type) != "undefined", 'fact type is undefined');
-        
-        console.log("type=" + type);
-
-        if (type == MATH_ARGUMENT || type == DEFAULT_TYPE) {
-            number = assistant.getArgument(NUMBER_ARGUMENT);
-        } else {
-            console.log("Arg=" + assistant.getArgument(type));
-            number = extractNumber(assistant.getArgument(type), type);
-        }
-       
-        assert(number, 'number is null');
-        console.log("number = " + number);
-
-        url += "/" + number + "/" + FACT_TYPES[type]; 
-        sendRequest(url, callback);
-    }
-    
-
-    /**
-     * Helper function that extracts the number from the given argument using regular expression.
-     */
-    function extractNumber(arg, type) {
-        // according to the API.AI documentation the @sys.date-period entity will return the date in a 
-        // ISO-8601 format. I.e. 2014-01-01/2014-12-31. The year is the first one in the return value, so
-        // my regular expression will match the numbers before the '-'. Similarly, I will need to account for the
-        // case when type is @sys.date, which will have the day as the last digits before the '-'.
-        var pattern = type == DATE_ARGUMENT ? /[\d]+$/ : /[\d]+/;
-        //var numb = arg.match(/[\d]+/);
-        var numb = arg.match(pattern);
-        return numb.join("");
+    if (type == MATH_ARGUMENT || type == DEFAULT_TYPE) {
+      number = assistant.getArgument(NUMBER_ARGUMENT);
+    } else {
+      console.log("Arg=" + assistant.getArgument(type));
+      number = extractNumber(assistant.getArgument(type), type);
     }
 
+    assert(number, 'number is null');
+    console.log("number = " + number);
 
-    /**
-     * Helper function to send the GET request to Numbers API
-     */
-    function sendRequest(url, callback) {
-        console.log("Sending GET to " + url);
-        request_lib.get(url, function(error, response, body) {
-            if (!error && response.statusCode == 200) { 
-                console.log("Fact is " + body);
-                callback(body);
-            } else {
-                console.log("Error=" + error);
-            }
-        });
-    }
+    url += "/" + number + "/" + FACT_TYPES[type]; 
+    sendRequest(url, callback);
+  }
 
 
-    /**
-     * Action for the welcome. It can be equivalently defined in the API.AI console as well.
-     */
-    function welcome(assistant) {
-        var reply = "Welcome to Number Facts! What number is on your mind?";
-        assistant.tell(reply);
-    }
+  /**
+   * Helper function that extracts the number from the given argument using regular expression.
+   */
+  function extractNumber(arg, type) {
+    // according to the API.AI documentation the @sys.date-period entity will return the date in a 
+    // ISO-8601 format. I.e. 2014-01-01/2014-12-31. The year is the first one in the return value, so
+    // my regular expression will match the numbers before the '-'. Similarly, I will need to account for the
+    // case when type is @sys.date, which will have the day as the last digits before the '-'.
+    var pattern = type == DATE_ARGUMENT ? /[\d]+$/ : /[\d]+/;
+    //var numb = arg.match(/[\d]+/);
+    var numb = arg.match(pattern);
+    return numb.join("");
+  }
 
 
-    /**
-     * Action that gets invoked when user wants to ask another fact (i.e. play again).
-     */
-    function playAgainYes() {
-        assistant.tell("Great! What's number on your mind?");
-    }
+  /**
+   * Helper function to send the GET request to Numbers API
+   */
+  function sendRequest(url, callback) {
+    console.log("Sending GET to " + url);
+    request_lib.get(url, function(error, response, body) {
+      if (!error && response.statusCode == 200) { 
+        console.log("Fact is " + body);
+        callback(body);
+      } else {
+        console.log("Error=" + error);
+      }
+    });
+  }
 
-    
-    /**
-     * Action that gets invoked when API.AI can't recognize what user said.
-     */
-    function fallback() {
-        assistant.tell(HELP_MESSAGE);
-    }
+
+  /**
+   * Action for the welcome. It can be equivalently defined in the API.AI console as well.
+   */
+  function welcome(assistant) {
+    var reply = "Welcome to Number Facts! What number is on your mind?";
+    assistant.tell(reply);
+  }
 
 
-    /**
-     * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
-     */
-    function playAgainNo() {
-        assistant.tell("Oh well...Everything good has to come to an end sometime. Good bye!");
-    }
+  /**
+   * Action that gets invoked when user wants to ask another fact (i.e. play again).
+   */
+  function playAgainYes() {
+    assistant.tell("Great! What's number on your mind?");
+  }
 
-    //testSendRequest();
-    let actionMap = new Map();
-    actionMap.set(PROVIDE_FACT, provideFact);
-    actionMap.set(DEFAULT_WELCOME, welcome); 
-    actionMap.set(PLAY_AGAIN_YES, playAgainYes);
-    actionMap.set(PLAY_AGAIN_NO, playAgainNo); 
-    actionMap.set(DEFAULT_FALLBACK, fallback); 
-    assistant.handleRequest(actionMap);
+
+  /**
+   * Action that gets invoked when API.AI can't recognize what user said.
+   */
+  function fallback() {
+    assistant.tell(HELP_MESSAGE);
+  }
+
+
+  /**
+   * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
+   */
+  function playAgainNo() {
+    assistant.tell("Oh well...Everything good has to come to an end sometime. Good bye!");
+  }
+
+  //testSendRequest();
+  let actionMap = new Map();
+  actionMap.set(PROVIDE_FACT, provideFact);
+  actionMap.set(DEFAULT_WELCOME, welcome); 
+  actionMap.set(PLAY_AGAIN_YES, playAgainYes);
+  actionMap.set(PLAY_AGAIN_NO, playAgainNo); 
+  actionMap.set(DEFAULT_FALLBACK, fallback); 
+  assistant.handleRequest(actionMap);
 });
 
 var server = app.listen(app.get('port'), function() {
-    console.log('App listening on port %s', server.address().port);
-    console.log('Press Ctrl+C to quit.');
+  console.log('App listening on port %s', server.address().port);
+  console.log('Press Ctrl+C to quit.');
 });
