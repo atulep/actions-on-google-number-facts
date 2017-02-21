@@ -6,8 +6,9 @@ let Assistant = require('actions-on-google').ApiAiAssistant;
 let express = require('express');
 let bodyParser = require('body-parser');
 let request_lib = require('request'); // for sending the http requests to Numbers API
-let app = express();
 let assert = require('assert');
+
+let app = express();
 
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({type: 'application/json'}));
@@ -41,17 +42,6 @@ const NUMBERS_API_BASE_URL = "http://numbersapi.com";
 app.post('/', function(request, response) {
     const assistant = new Assistant({request: request, response: response});
     
-    /* 
-     * Useful to test my call back functions.   
-    function testSendRequest() {
-        console.log("Test...");
-        var url = "http://numbersapi.com/7/math";        
-        sendRequest(url, callback);
-    } 
-    
-    function callback(res) {
-        console.log("Result from sendRequest is " + res);
-    }*/
 
     /**
      * Callback used to perform the logic after Node finishes the API request.
@@ -62,8 +52,9 @@ app.post('/', function(request, response) {
         assistant.tell(PREFIX_HAPPY + fact + "Would you like to try another number?");
     }
 
+
     /**
-     * An action that provides a fact based on the given number by the user. 
+     * An action that provides a fact based on the given number and type of fact. 
      */
     function provideFact(assistant) {
         var number;
@@ -79,9 +70,10 @@ app.post('/', function(request, response) {
         }
         
         if (type == null) type = DEFAULT_TYPE;
-
-        assert(typeof(type) != "undefined", 'fact type is null');
+        assert(typeof(type) != "undefined", 'fact type is undefined');
+        
         console.log("type=" + type);
+
         if (type == MATH_ARGUMENT || type == DEFAULT_TYPE) {
             number = assistant.getArgument(NUMBER_ARGUMENT);
         } else {
@@ -93,7 +85,7 @@ app.post('/', function(request, response) {
         console.log("number = " + number);
 
         url += "/" + number + "/" + FACT_TYPES[type]; 
-        sendRequest(url, callback); // defaults to trivia
+        sendRequest(url, callback);
     }
     
 
@@ -111,6 +103,7 @@ app.post('/', function(request, response) {
         return numb.join("");
     }
 
+
     /**
      * Helper function to send the GET request to Numbers API
      */
@@ -126,6 +119,7 @@ app.post('/', function(request, response) {
         });
     }
 
+
     /**
      * Action for the welcome. It can be equivalently defined in the API.AI console as well.
      */
@@ -134,12 +128,14 @@ app.post('/', function(request, response) {
         assistant.tell(reply);
     }
 
+
     /**
      * Action that gets invoked when user wants to ask another fact (i.e. play again).
      */
     function playAgainYes() {
         assistant.tell("Great! What's number on your mind?");
     }
+
 
     /**
      * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
