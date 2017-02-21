@@ -21,11 +21,11 @@ const CONTEXT_PLAY_AGAIN = "again_yes_no";
 const NUMBER_ARGUMENT = "number";
 const DATE_ARGUMENT = "date";
 const YEAR_ARGUMENT = "date-period";
+const DEFAULT_FALLBACK = "input.unknown";
 // API.AI already allows for robust processing of days/years. Thus, I deferred recognition of days/years to 
 // @sys.date/@sys.date-period native entities. I added an entity @fact-type that only contains 'math'. 
 // Thus, we can only expect fact-type to be math-related.
 const MATH_ARGUMENT = "fact-type";
-
 // other useful contstants
 const PREFIX_HAPPY = "Sure. Did you know that ";
 const DEFAULT_TYPE = "trivia";
@@ -38,6 +38,13 @@ FACT_TYPES[YEAR_ARGUMENT] = 'year';
 FACT_TYPES[MATH_ARGUMENT] = 'math';
 FACT_TYPES[DEFAULT_TYPE] = 'trivia';
 const NUMBERS_API_BASE_URL = "http://numbersapi.com";
+const HELP_MESSAGE = "I didn't get that. You can ask me about any number. You can also ask me about " +
+                                                                  FACT_TYPES[DATE_ARGUMENT] + ", " + 
+                                                                  FACT_TYPES[YEAR_ARGUMENT] + ", and " + 
+                                                                  FACT_TYPES[MATH_ARGUMENT] + " that this number represents. " + 
+                                                                  "For example, you can say: 'Tell me about 777', or " +
+                                                                  "'Tell me some math about 777'."; 
+                                                                  
 
 app.post('/', function(request, response) {
     const assistant = new Assistant({request: request, response: response});
@@ -136,6 +143,14 @@ app.post('/', function(request, response) {
         assistant.tell("Great! What's number on your mind?");
     }
 
+    
+    /**
+     * Action that gets invoked when API.AI can't recognize what user said.
+     */
+    function fallback() {
+        assistant.tell(HELP_MESSAGE);
+    }
+
 
     /**
      * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
@@ -149,7 +164,8 @@ app.post('/', function(request, response) {
     actionMap.set(PROVIDE_FACT, provideFact);
     actionMap.set(DEFAULT_WELCOME, welcome); 
     actionMap.set(PLAY_AGAIN_YES, playAgainYes);
-    actionMap.set(PLAY_AGAIN_NO, playAgainNo);  
+    actionMap.set(PLAY_AGAIN_NO, playAgainNo); 
+    actionMap.set(DEFAULT_FALLBACK, fallback); 
     assistant.handleRequest(actionMap);
 });
 
