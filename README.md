@@ -3,6 +3,7 @@ This is Action on Google that uses Node as a fulfillment provider. It can be loa
 
 # Setup Instructions
 Most of the steps here are the same as in [Actions on Google](https://github.com/actions-on-google) official GitHub page.
+
 1. Create a new [API.AI](https://api.ai)
 2. Click on the project gear icon to see the project settings.
 3. Select "Export and Import".
@@ -18,6 +19,7 @@ Most of the steps here are the same as in [Actions on Google](https://github.com
 # Usage
 `Numbers API` provides different types of facts: date, year, math and trivia (default). You can communicate with `Number Facts` by asking it about any of those types.
 Sample queries include:
+
 1. Tell me what happened on the 3rd?
 2. Tell me something mathematical about 333?
 3. Tell me about year 777?
