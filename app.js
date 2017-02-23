@@ -56,7 +56,7 @@ app.post('/', function(request, response) {
   function callback(fact) {
     // important to set the context before invoking assistant.tell
     assistant.setContext(CONTEXT_PLAY_AGAIN);
-    assistant.tell(PREFIX_HAPPY + fact + " Would you like to try another number?");
+    assistant.ask(PREFIX_HAPPY + fact + " Would you like to try another number?");
   }
 
 
@@ -132,7 +132,8 @@ app.post('/', function(request, response) {
    */
   function welcome(assistant) {
     var reply = "Welcome to Number Facts! What number is on your mind?";
-    assistant.tell(reply);
+    // ask vs. tell -> expects reply vs. doesn't expect reply
+    assistant.ask(reply);
   }
 
 
@@ -140,7 +141,7 @@ app.post('/', function(request, response) {
    * Action that gets invoked when user wants to ask another fact (i.e. play again).
    */
   function playAgainYes() {
-    assistant.tell("Great! What's number on your mind?");
+    assistant.ask("Great! What's number on your mind?");
   }
 
 
