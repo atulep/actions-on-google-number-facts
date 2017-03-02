@@ -1,0 +1,16 @@
+{
+  "name": "number-facts",
+  "description": "Google Actions application (via Actions SDK) that uses Numbers API to do the fulfillment.",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "author": "atulep",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.13.4",
+    "request": "^2.79.0",
+    "sprintf-js": "^1.0.3",
+    "actions-on-google": "^1.0.0",
+    "assert": "^1.4.1"
+  }
+}
