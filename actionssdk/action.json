@@ -1,11 +1,13 @@
 {
-  "versionLabel": "<INSERT YOUR VERSION LABEL HERE>",
+  "versionLabel": "1.0.0",
   "agentInfo": {
     "languageCode": "en-US",
-    "projectId": "<INSERT YOUR PROJECT ID HERE>",
+    "projectId": "number-facts",
     "voiceName": "male_1"
   },
   "actions": [
+  // ACTIONS ARRAY BEGIN
+    // MAIN INTENT
     {
       "description": "Launch intent",
       "initialTrigger": {
@@ -15,22 +17,48 @@
         "url": "<INSERT YOUR EXECUTION URL HERE>"
       }
     },
+    // PLAY AGAIN YES
     {
-      "description": "guess a number game",
+      "description": "user wants to play again",
       "initialTrigger": {
-        "intent": "START_GUESS_NUMBER",
+        "intent": "play_again_yes",
+        // TODO: need to have a specific context in order to match "yes" with this action. 
         "queryPatterns": [
-          {
-            "queryPattern": "find a magic number"
-          },
-          {
-            "queryPattern": "guess a number"
-          }
+          { "queryPattern": "yes" }
+        ]
+      },
+      "httpExecution": {
+        "url": "<INSERT YOUR EXECUTION URL HERE>"
+      }
+    },
+    // PLAY AGAIN NO
+    {
+      "description": "user doesn't want to play again",
+      "initialTrigger" : {
+        "intent": "play_again_no",
+        // TODO: need to have a specific context in order to match "yes" with this action. 
+        "queryPatterns": [
+          { "queryPattern" : "no" }
+        ]
+      },
+      "httpExecution": {
+        "url": "<INSERT YOUR EXECUTION URL HERE>"
+      }
+    },
+    // PROVIDE FACT
+    {
+      "description": "user asks to provide a fact about a number/date/year",
+      "initialTrigger": {
+        "intent": "provide_fact",
+        "queryPatterns": [
+          // TODO: Expand the query patters to account for different varieties of dates/years etc.
+          { "queryPattern" : "7" },
         ]
       },
       "httpExecution": {
         "url": "<INSERT YOUR EXECUTION URL HERE>"
       }
     }
+   // ACTIONS ARRAY END
   ]
 }
