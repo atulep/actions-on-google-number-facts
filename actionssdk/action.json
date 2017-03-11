@@ -6,59 +6,50 @@
     "voiceName": "male_1"
   },
   "actions": [
-  // ACTIONS ARRAY BEGIN
-    // MAIN INTENT
     {
       "description": "Launch intent",
       "initialTrigger": {
         "intent": "assistant.intent.action.MAIN"
       },
       "httpExecution": {
-        "url": "<INSERT YOUR EXECUTION URL HERE>"
+        "url": "https://47a03eeb.ngrok.io"
       }
     },
-    // PLAY AGAIN YES
     {
       "description": "user wants to play again",
       "initialTrigger": {
         "intent": "play_again_yes",
-        // TODO: need to have a specific context in order to match "yes" with this action. 
         "queryPatterns": [
           { "queryPattern": "yes" }
         ]
       },
       "httpExecution": {
-        "url": "<INSERT YOUR EXECUTION URL HERE>"
+        "url": "https://47a03eeb.ngrok.io"
       }
     },
-    // PLAY AGAIN NO
     {
       "description": "user doesn't want to play again",
       "initialTrigger" : {
         "intent": "play_again_no",
-        // TODO: need to have a specific context in order to match "yes" with this action. 
         "queryPatterns": [
           { "queryPattern" : "no" }
         ]
       },
       "httpExecution": {
-        "url": "<INSERT YOUR EXECUTION URL HERE>"
+        "url": "https://47a03eeb.ngrok.io"
       }
     },
-    // PROVIDE FACT
     {
       "description": "user asks to provide a fact about a number/date/year",
       "initialTrigger": {
         "intent": "provide_fact",
         "queryPatterns": [
-          // TODO: Expand the query patters to account for different varieties of dates/years etc.
-          { "queryPattern" : "7" },
+          { "queryPattern" : "7" }
         ]
       },
       "httpExecution": {
-        "url": "<INSERT YOUR EXECUTION URL HERE>"
+        "url": "https://47a03eeb.ngrok.io"
       }
     }
-   // ACTIONS ARRAY END
   ]
 }
