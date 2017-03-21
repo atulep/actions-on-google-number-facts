@@ -131,7 +131,6 @@ app.post('/', function(request, response) {
    * Action for the welcome. It can be equivalently defined in the API.AI console as well.
    */
   function welcome(assistant) {
-    console.log("Hello!");
     var reply = assistant.buildInputPrompt(false, "Welcome to Number Facts! What number is on your mind?");
     // ask vs. tell -> expects reply vs. doesn't expect reply
     assistant.ask(reply);
@@ -163,8 +162,9 @@ app.post('/', function(request, response) {
 
   //testSendRequest();
   let actionMap = new Map();
-  //actionMap.set(PROVIDE_FACT, provideFact);
-  actionMap.set(assistant.intent.action.MAIN, welcome); 
+  actionMap.set(PROVIDE_FACT, provideFact);
+  actionMap.set(assistant.StandardIntents.MAIN, welcome); 
+  actionMap.set(assistant.StandardIntents.TEXT, provideFact);
   //actionMap.set(PLAY_AGAIN_YES, playAgainYes);
   //actionMap.set(PLAY_AGAIN_NO, playAgainNo); 
   //actionMap.set(DEFAULT_FALLBACK, fallback); 

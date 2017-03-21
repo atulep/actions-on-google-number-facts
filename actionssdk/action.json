@@ -12,7 +12,7 @@
         "intent": "assistant.intent.action.MAIN"
       },
       "httpExecution": {
-        "url": "https://47a03eeb.ngrok.io"
+        "url": "https://31f4563a.ngrok.io"
       }
     },
     {
@@ -24,7 +24,7 @@
         ]
       },
       "httpExecution": {
-        "url": "https://47a03eeb.ngrok.io"
+        "url": "https://31f4563a.ngrok.io"
       }
     },
     {
@@ -36,7 +36,7 @@
         ]
       },
       "httpExecution": {
-        "url": "https://47a03eeb.ngrok.io"
+        "url": "https://31f4563a.ngrok.io"
       }
     },
     {
@@ -44,11 +44,11 @@
       "initialTrigger": {
         "intent": "provide_fact",
         "queryPatterns": [
-          { "queryPattern" : "7" }
+          { "queryPattern" : "$SchemaOrg_number:number" }
         ]
       },
       "httpExecution": {
-        "url": "https://47a03eeb.ngrok.io"
+        "url": "https://31f4563a.ngrok.io"
       }
     }
   ]
