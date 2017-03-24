@@ -12,43 +12,16 @@
         "intent": "assistant.intent.action.MAIN"
       },
       "httpExecution": {
-        "url": "https://31f4563a.ngrok.io"
+        "url": "https://156a62f3.ngrok.io"
       }
     },
-    {
-      "description": "user wants to play again",
+   {
+      "description": "Intent triggered during the in-dialog conversation.",
       "initialTrigger": {
-        "intent": "play_again_yes",
-        "queryPatterns": [
-          { "queryPattern": "yes" }
-        ]
+        "intent": "assistant.intent.action.TEXT"
       },
       "httpExecution": {
-        "url": "https://31f4563a.ngrok.io"
-      }
-    },
-    {
-      "description": "user doesn't want to play again",
-      "initialTrigger" : {
-        "intent": "play_again_no",
-        "queryPatterns": [
-          { "queryPattern" : "no" }
-        ]
-      },
-      "httpExecution": {
-        "url": "https://31f4563a.ngrok.io"
-      }
-    },
-    {
-      "description": "user asks to provide a fact about a number/date/year",
-      "initialTrigger": {
-        "intent": "provide_fact",
-        "queryPatterns": [
-          { "queryPattern" : "$SchemaOrg_number:number" }
-        ]
-      },
-      "httpExecution": {
-        "url": "https://31f4563a.ngrok.io"
+        "url": "https://156a62f3.ngrok.io"
       }
     }
   ]

@@ -67,7 +67,9 @@ app.post('/', function(request, response) {
     var number;
     var url = NUMBERS_API_BASE_URL;
     var type;
-
+    
+    // TODO: DO NLP here. Need to be able to recognize dates, math, numbers etc. in the string input.
+    // here are some libraries that I may use https://www.npmjs.com/browse/keyword/nlp
     for (var fact_type in FACT_TYPES) {
       console.log('fact_type=' + fact_type);
       if (assistant.getArgument(fact_type) != null) {
@@ -162,12 +164,10 @@ app.post('/', function(request, response) {
 
   //testSendRequest();
   let actionMap = new Map();
-  actionMap.set(PROVIDE_FACT, provideFact);
+  // only 2 possible intents are possible. 
+  // see http://stackoverflow.com/questions/41427697/expectedinputs-possible-intents-only-works-with-assistant-intent-action-text
   actionMap.set(assistant.StandardIntents.MAIN, welcome); 
   actionMap.set(assistant.StandardIntents.TEXT, provideFact);
-  //actionMap.set(PLAY_AGAIN_YES, playAgainYes);
-  //actionMap.set(PLAY_AGAIN_NO, playAgainNo); 
-  //actionMap.set(DEFAULT_FALLBACK, fallback); 
   assistant.handleRequest(actionMap);
 });
 
