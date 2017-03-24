@@ -12,16 +12,21 @@
         "intent": "assistant.intent.action.MAIN"
       },
       "httpExecution": {
-        "url": "https://156a62f3.ngrok.io"
+        "url": "https://d2c1626f.ngrok.io"
       }
     },
-   {
-      "description": "Intent triggered during the in-dialog conversation.",
+    {
+      "description": "In dialog intent",
       "initialTrigger": {
-        "intent": "assistant.intent.action.TEXT"
+        "intent": "assistant.intent.action.TEXT",
+        "queryPatterns": [
+          {
+            "queryPattern": "$SchemaOrg_number:number"
+          }
+        ]
       },
       "httpExecution": {
-        "url": "https://156a62f3.ngrok.io"
+        "url": "https://d2c1626f.ngrok.io"
       }
     }
   ]

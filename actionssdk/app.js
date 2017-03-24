@@ -43,7 +43,7 @@ app.post('/', function(request, response) {
   function provideFact(assistant) {
     var number;
     var url = NUMBERS_API_BASE_URL;
-     
+    
     number = extractNumber(assistant.getRawInput());
     if (number == null) { 
       if (assistant.getRawInput().toLowerCase() === 'yes') {
