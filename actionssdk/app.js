@@ -13,39 +13,12 @@ let app = express();
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({type: 'application/json'}));
 
-// name of the actions -- correspond to the names I defined in the API.AI console
-const PROVIDE_FACT = "provide_fact";
-const PLAY_AGAIN_YES = "play_again_yes";
-const PLAY_AGAIN_NO = "play_again_no";
-const DEFAULT_WELCOME = "input.welcome";
-const CONTEXT_PLAY_AGAIN = "again_yes_no"; 
 const NUMBER_ARGUMENT = "number";
-const DATE_ARGUMENT = "date";
-const YEAR_ARGUMENT = "date-period";
-const DEFAULT_FALLBACK = "input.unknown";
-// API.AI already allows for robust processing of days/years. Thus, I deferred recognition of days/years to 
-// @sys.date/@sys.date-period native entities. I added an entity @fact-type that only contains 'math'. 
-// Thus, we can only expect fact-type to be math-related.
-const MATH_ARGUMENT = "fact-type";
-// other useful contstants
 const PREFIX_HAPPY = "Sure. Did you know that ";
+// type of the fact to be used for the Numbers API. API can accept several other types, such as date and math.
 const DEFAULT_TYPE = "trivia";
-// map the fact types returned from API.AI to the ones expected at Numbers API
-const FACT_TYPES = {};
-// need to put the variables into dictionary by hand. 
-// see http://stackoverflow.com/questions/10640159/key-for-javascript-dictionary-is-not-stored-as-value-but-as-variable-name
-FACT_TYPES[DATE_ARGUMENT] = 'date';
-FACT_TYPES[YEAR_ARGUMENT] = 'year'; 
-FACT_TYPES[MATH_ARGUMENT] = 'math';
-FACT_TYPES[DEFAULT_TYPE] = 'trivia';
 const NUMBERS_API_BASE_URL = "http://numbersapi.com";
-const HELP_MESSAGE = "I didn't get that. You can ask me about any number. You can also ask me about " +
-                                                                     FACT_TYPES[DATE_ARGUMENT] + ", " + 
-                                                                 FACT_TYPES[YEAR_ARGUMENT] + ", and " + 
-                                                                            FACT_TYPES[MATH_ARGUMENT] + 
-                                                                     " that this number represents. " + 
-                                                 "For example, you can say: 'Tell me about 777', or " +
-                                                                       "'Tell me some math about 777'."; 
+const HELP_MESSAGE = "I didn't get that. You can ask me about any number. For example, you can say: 'Tell me about 777'";
 
 app.post('/', function(request, response) {
   const assistant = new ActionsSdkAssistant({request: request, response: response});
@@ -70,21 +43,19 @@ app.post('/', function(request, response) {
   function provideFact(assistant) {
     var number;
     var url = NUMBERS_API_BASE_URL;
-    var type;
      
-    number = extractNumber(assistant.getRawInput(), NUMBER_ARGUMENT);
+    number = extractNumber(assistant.getRawInput());
     if (number == null) { 
       if (assistant.getRawInput().toLowerCase() === 'yes') {
         // user wants to play more
         playAgainYes();
-        return;  
       } else if (assistant.getRawInput().toLowerCase() === 'no') {
         // user doesn't want to play more
         playAgainNo();
-        return;
       } else {
-        assert(false, "Invalid input: " + assistant.getRawInput());
+        fallback();
       }
+      return;
     }
     assert(number, 'number is null');
     console.log("number = " + number);
@@ -92,16 +63,12 @@ app.post('/', function(request, response) {
     sendRequest(url, callback);
   }
 
+
   /**
    * Helper function that extracts the number from the given argument using regular expression.
    */
-  function extractNumber(arg, type) {
-    // according to the API.AI documentation the @sys.date-period entity will return the date in a 
-    // ISO-8601 format. I.e. 2014-01-01/2014-12-31. The year is the first one in the return value, so
-    // my regular expression will match the numbers before the '-'. Similarly, I will need to account for the
-    // case when type is @sys.date, which will have the day as the last digits before the '-'.
-    var pattern = type == DATE_ARGUMENT ? /[\d]+$/ : /[\d]+/;
-    //var numb = arg.match(/[\d]+/);
+  function extractNumber(arg) {
+    var pattern = /[\d]+/;
     var numb = arg.match(pattern);
     return numb ? numb.join("") : null;
   }
@@ -127,7 +94,8 @@ app.post('/', function(request, response) {
    * Action for the welcome. It can be equivalently defined in the API.AI console as well.
    */
   function welcome(assistant) {
-    var reply = assistant.buildInputPrompt(false, "Welcome to Number Facts! What number is on your mind?");
+    const reply = assistant.buildInputPrompt(false, "Welcome to Number Facts! What number is on your mind?",
+                                           ['Say any number', 'Pick a number']);
     // ask vs. tell -> expects reply vs. doesn't expect reply
     assistant.ask(reply);
   }
@@ -137,7 +105,8 @@ app.post('/', function(request, response) {
    * Action that gets invoked when user wants to ask another fact (i.e. play again).
    */
   function playAgainYes() {
-    assistant.ask("Great! What's number on your mind?");
+    const response = assistant.buildInputPrompt(false, "Great! What's number on your mind?", ['Say any number', 'Pick a number']);
+    assistant.ask(response);
   }
 
 
@@ -153,10 +122,10 @@ app.post('/', function(request, response) {
    * Action that gets invoked when user doesn't want to ask another fact (i.e. don't play again).
    */
   function playAgainNo() {
+    // You don't have to use buildInputPrompt!
     assistant.tell("Oh well...Everything good has to come to an end sometime. Good bye!");
   }
 
-  //testSendRequest();
   let actionMap = new Map();
   // only 2 possible intents are possible. 
   // see http://stackoverflow.com/questions/41427697/expectedinputs-possible-intents-only-works-with-assistant-intent-action-text
