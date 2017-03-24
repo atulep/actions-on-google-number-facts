@@ -12,6 +12,7 @@ let app = express();
 
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParser.json({type: 'application/json'}));
+
 // name of the actions -- correspond to the names I defined in the API.AI console
 const PROVIDE_FACT = "provide_fact";
 const PLAY_AGAIN_YES = "play_again_yes";
@@ -55,10 +56,8 @@ app.post('/', function(request, response) {
    */
   function callback(fact) {
     // important to set the context before invoking assistant.tell
-    assistant.setContext(CONTEXT_PLAY_AGAIN);
     assistant.ask(PREFIX_HAPPY + fact + " Would you like to try another number?");
   }
-
 
   /**
    * An action that provides a fact based on the given number and type of fact. 
@@ -72,14 +71,26 @@ app.post('/', function(request, response) {
     var number;
     var url = NUMBERS_API_BASE_URL;
     var type;
-   
+     
     number = extractNumber(assistant.getRawInput(), NUMBER_ARGUMENT);
+    if (number == null) { 
+      if (assistant.getRawInput().toLowerCase() === 'yes') {
+        // user wants to play more
+        playAgainYes();
+        return;  
+      } else if (assistant.getRawInput().toLowerCase() === 'no') {
+        // user doesn't want to play more
+        playAgainNo();
+        return;
+      } else {
+        assert(false, "Invalid input: " + assistant.getRawInput());
+      }
+    }
     assert(number, 'number is null');
     console.log("number = " + number);
     url += "/" + number + "/" + DEFAULT_TYPE; 
     sendRequest(url, callback);
   }
-
 
   /**
    * Helper function that extracts the number from the given argument using regular expression.
@@ -92,7 +103,7 @@ app.post('/', function(request, response) {
     var pattern = type == DATE_ARGUMENT ? /[\d]+$/ : /[\d]+/;
     //var numb = arg.match(/[\d]+/);
     var numb = arg.match(pattern);
-    return numb.join("");
+    return numb ? numb.join("") : null;
   }
 
 
