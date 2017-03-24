@@ -62,38 +62,21 @@ app.post('/', function(request, response) {
 
   /**
    * An action that provides a fact based on the given number and type of fact. 
+   *
+   * In a "real" application, one would want to do Natural Language Processing to parse the raw input from the user. Actions SDK
+   * only allows two types of intents (MAIN and TEXT). All of the in-dialog interactions get mapped to TEXT intent. 
+   * 
+   * Here are some libraries that you may use to do NLP: https://www.npmjs.com/browse/keyword/nlp
    */
   function provideFact(assistant) {
     var number;
     var url = NUMBERS_API_BASE_URL;
     var type;
-    
-    // TODO: DO NLP here. Need to be able to recognize dates, math, numbers etc. in the string input.
-    // here are some libraries that I may use https://www.npmjs.com/browse/keyword/nlp
-    for (var fact_type in FACT_TYPES) {
-      console.log('fact_type=' + fact_type);
-      if (assistant.getArgument(fact_type) != null) {
-        type = fact_type;
-        break;
-      }
-    }
-
-    if (type == null) type = DEFAULT_TYPE;
-    assert(typeof(type) != "undefined", 'fact type is undefined');
-
-    console.log("type=" + type);
-
-    if (type == MATH_ARGUMENT || type == DEFAULT_TYPE) {
-      number = assistant.getArgument(NUMBER_ARGUMENT);
-    } else {
-      console.log("Arg=" + assistant.getArgument(type));
-      number = extractNumber(assistant.getArgument(type), type);
-    }
-
+   
+    number = extractNumber(assistant.getRawInput(), NUMBER_ARGUMENT);
     assert(number, 'number is null');
     console.log("number = " + number);
-
-    url += "/" + number + "/" + FACT_TYPES[type]; 
+    url += "/" + number + "/" + DEFAULT_TYPE; 
     sendRequest(url, callback);
   }
 
