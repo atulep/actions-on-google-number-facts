@@ -12,21 +12,7 @@
         "intent": "assistant.intent.action.MAIN"
       },
       "httpExecution": {
-        "url": "https://d2c1626f.ngrok.io"
-      }
-    },
-    {
-      "description": "In dialog intent",
-      "initialTrigger": {
-        "intent": "assistant.intent.action.TEXT",
-        "queryPatterns": [
-          {
-            "queryPattern": "$SchemaOrg_number:number"
-          }
-        ]
-      },
-      "httpExecution": {
-        "url": "https://d2c1626f.ngrok.io"
+        "url": "https://83ec3eaa.ngrok.io"
       }
     }
   ]
